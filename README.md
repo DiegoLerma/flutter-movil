@@ -26,6 +26,8 @@ Una vez instalado Flutter, puedes clonar este repositorio y entrar en cualquiera
 git clone https://github.com/DiegoLerma/flutter-movil.git
 cd flutter-movil/01_hello_world
 flutter run
+```
+
 Contribuciones
 Este repositorio es personal y se utiliza como parte de mi proceso de aprendizaje. Aunque no estoy buscando contribuciones directas, cualquier feedback es bienvenido.
 
