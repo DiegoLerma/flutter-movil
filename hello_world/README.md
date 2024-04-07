@@ -13,8 +13,6 @@ El curso de Flutter, impartido por [Fernando Herrera](https://fernando-herrera.c
 Este repositorio está organizado en subdirectorios, cada uno correspondiente a un proyecto o conjunto de ejercicios del curso. Aquí está la lista de proyectos incluidos:
 
 - **01_hello_world**: Una aplicación simple para mostrar el clásico "Hello, World!".
-- **02_counter_app**: Implementación de una aplicación contador básica para entender el estado y la lógica básica en Flutter.
-- **...**: Más proyectos seguirán a medida que progreso en el curso.
 
 ## Cómo Usar
 
