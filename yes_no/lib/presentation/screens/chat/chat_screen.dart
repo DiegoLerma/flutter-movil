@@ -27,8 +27,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: const Padding(
         padding: EdgeInsets.all(4.0),
         child: CircleAvatar(
+          minRadius: 6,
+          maxRadius: 6,
           backgroundImage: NetworkImage(
-              "https://phantom-marca-us.unidadeditorial.es/0a774892da73bbeb49a02e9a8e39e3ad/resize/828/f/jpg/assets/multimedia/imagenes/2023/01/08/16731951733620.jpg"),
+              "https://lh3.googleusercontent.com/pw/AP1GczMuth-tDAekLWuJIWWTm0e9_JaIu1IIIe8bn8w24ykpesbFu5qKop7-MIgIABRnqNV5JHnTcT1wTfqSuyGERAjG0xtZ6nUxToww2SjmbdtqiK3ywBaQVvzpb14H4T3UO6uK8JLkMjHZMib1XsrIQU88wvr1pjxGEUwCMznnnFRnOsUuFODz_DAoH6v_x0XxA4-Mmo02_C58nwLOXgbW7fzH7ruod4Z324VqsA65g89RN7MVy6FCAQou8tt67NQcM0iOGkqWGD6U1DKUm9inwoCeODiIySwKl2tTdo4z9uE9CeOBKJB3AduzUeyOIdi9BHj7_30UEkKky2BSdAj2OGDiipdOhOMCVVcorsEj14t63afu0zvl2y6_ryTiu9he0cJUadHR13ItjScRuHhSfevEQQqICmkzoCezIdY_yIO-uzeiD_2XIose4-AxVtDLgHAmYxMZ1QFEBdldZtJP-Uwqta_EY2a2iy6fbwy-Y18tGu1ddoj3pxJa_AFTqzw_XaXhimiPABpmzavv8_CsMQLTGLOOW2qeG_LGez66JPlBZCIdFvGWlV7pHuNlo-p00cI4r1EJg00xbOcQX01ejQrWDsVpgdagQ9IbCQfY2g2EWRXXmtZWQwKaCNEHyEeniaF56fyiULXspIi883IJuwtIBUAKpK7HQrkduQvVEx1O4nN-IHw2OejMzEvSO-pFRP_ke7NrshUMqUt3UK7Q_Yn40oR89AV9XXw8n_t4iOG8g5DDdCAKJ7MyiDBraalP1woZ38OJZ3d0EMaaALNWYjqKexIV2E9x5897f2litAS4NSCF5DcF0wTxmFstmQqwoVUigmczghA8EUV-V0vozt68xT-H5D5XG1CODoJ-AvcuUtzcDsRkUgE53D34sxJuHL7PU8YHn7ZYUThWQVq9VZ1V=w726-h970-s-no-gm?authuser=0"),
         ),
       ),
       title: const Text('Mi amors ❤️'),
