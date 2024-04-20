@@ -16,57 +16,13 @@ Código AI Triage es una aplicación interactiva de triaje asistida por un chatb
 ## Configuración del Entorno
 Describe los pasos para configurar el entorno de desarrollo, como la instalación de dependencias de Python, configuración de variables de entorno, y cómo instalar Flutter y las dependencias de Dart.
 
-```bash
-pip install -r requirements.txt
-export AZURE_OPENAI_ENDPOINT='tu_endpoint'
-export AZURE_OPENAI_API_KEY='tu_api_key'
 flutter pub get
-```
-
-## Ejecución de la Aplicación
-Instrucciones detalladas sobre cómo ejecutar la aplicación, tanto para el backend como para el frontend.
-
-```bash
-# Para ejecutar el servidor FastAPI
-uvicorn main:app --reload
 
 # Para ejecutar la aplicación Flutter
 flutter run
-```
-
-## Estructura del Proyecto
-Una explicación de la estructura de archivos y directorios de alto nivel.
-
-```
-/codigo_ai_triage
-|-- /android
-|-- /ios
-|-- /lib
-|   |-- /models
-|   |-- /services
-|   |-- /views
-|   |-- /widgets
-|   |-- main.dart
-|-- /test
-|-- pubspec.yaml
-|-- /backend
-    |-- main.py
-    |-- /venv
-    |-- requirements.txt
-```
-
-## Pruebas
-Explica cómo ejecutar las pruebas unitarias y de integración.
-
-```bash
-# Para pruebas de backend
-pytest
-
-# Para pruebas de Flutter
-flutter test
-```
 
 ## Contribuir
+TODO
 Guías para contribuir al proyecto, incluyendo estándares de código, cómo enviar pull requests y otros procesos relevantes.
 
 ## Licencia
@@ -75,6 +31,8 @@ Detalles sobre la licencia del proyecto. Por ejemplo:
 Este proyecto está licenciado bajo la Licencia MIT - vea el archivo [LICENSE](LICENSE) para más detalles.
 
 ## Contacto
+TODO
 Información sobre cómo contactar al equipo del proyecto o al mantenedor.
 
 ## Agradecimientos
+TODO
