@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:yes_no/domain/entities/message.dart';
 
 class UserMessageBubble extends StatelessWidget {
@@ -18,10 +19,19 @@ class UserMessageBubble extends StatelessWidget {
                 color: colors.primary, borderRadius: BorderRadius.circular(20)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text(message.text,
-                  style: const TextStyle(color: Colors.white)),
+              // Usando MarkdownBody para renderizar el mensaje del usuario
+              child: MarkdownBody(
+                data: message.text,
+                styleSheet:
+                    MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                  p: TextStyle(color: Colors.white), // Texto en markdown
+                  strong: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold), // Para texto en negrita
+                ),
+              ),
             )),
-        const SizedBox(height: 5)
+        const SizedBox(height: 5) // Espacio después del mensaje
       ],
     );
   }

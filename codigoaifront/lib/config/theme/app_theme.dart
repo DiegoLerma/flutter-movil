@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-const Color _customColor = Color.fromRGBO(130, 193, 40, 1);
+const Color _customColor = Color.fromRGBO(250, 247, 242, 1);
 
 const List<Color> _colorThemes = [
   _customColor,
-  Color.fromRGBO(255, 125, 10, 1),
-  Colors.teal,
+  Color.fromRGBO(179, 219, 218, 1),
+  Color.fromRGBO(254, 229, 224, 1),
   Color.fromRGBO(13, 146, 118, 1),
-  Color.fromRGBO(154, 200, 205, 1),
-  Color.fromRGBO(22, 121, 171, 1),
-  Color.fromRGBO(219, 19, 122, 1),
+  Color.fromRGBO(255, 191, 195, 1),
+  Color.fromRGBO(169, 160, 153, 1),
+  Color.fromRGBO(218, 235, 250, 1),
 ];
 
 class AppTheme {

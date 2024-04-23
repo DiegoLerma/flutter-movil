@@ -17,7 +17,14 @@ class ChatProvider extends ChangeNotifier {
     messageList.add(newMessage);
     notifyListeners();
     moveScrollToBottom();
-    await sendToApi(text);
+    try {
+      await sendToApi(text);
+    } catch (e) {
+      // Mostrar mensaje de error en la interfaz de usuario si es necesario
+      final errorMessage = Message(text: e.toString(), fromWho: FromWho.bot);
+      messageList.add(errorMessage);
+      notifyListeners();
+    }
   }
 
   Future<void> sendToApi(String text) async {
@@ -31,29 +38,46 @@ class ChatProvider extends ChangeNotifier {
         },
       );
       if (response.statusCode == 200 && response.data != null) {
-        // Asumiendo que la respuesta de FastAPI es un JSON con una clave 'text'
         final botMessage =
             Message(text: response.data['text'], fromWho: FromWho.bot);
         messageList.add(botMessage);
         notifyListeners();
         moveScrollToBottom();
       } else {
-        // Manejo de errores de API
         throw Exception(
-            'Error al cargar mensaje. Por favor contacta al administrador.');
+            'Error al recibir respuesta del servidor. Código de estado: ${response.statusCode}');
       }
+    } on DioException catch (dioException) {
+      // Utilizar el mensaje y la información específica de DioException para una mejor respuesta
+      String errorMessage = 'Error de comunicación';
+      if (dioException.type == DioExceptionType.connectionTimeout) {
+        errorMessage = 'Tiempo de conexión agotado';
+      } else if (dioException.type == DioExceptionType.sendTimeout) {
+        errorMessage = 'Tiempo de envío agotado';
+      } else if (dioException.type == DioExceptionType.receiveTimeout) {
+        errorMessage = 'Tiempo de recepción agotado';
+      } else if (dioException.type == DioExceptionType.badResponse) {
+        errorMessage = 'Respuesta no válida del servidor';
+      } else if (dioException.type == DioExceptionType.connectionError) {
+        errorMessage = 'Error de conexión: ${dioException.message}';
+      } else if (dioException.type == DioExceptionType.cancel) {
+        errorMessage = 'Solicitud cancelada';
+      } else {
+        errorMessage = 'Error desconocido: ${dioException.message}';
+      }
+      throw Exception(errorMessage);
     } catch (e) {
-      print(
-          'Error al enviar mensaje: $e'); // Esto ayudará a depurar el problema
-      throw Exception('Error al enviar mensaje.');
+      throw Exception('Error inesperado: $e');
     }
   }
 
   Future<void> moveScrollToBottom() async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    chatScrollController.animateTo(
-        chatScrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut);
+    if (chatScrollController.hasClients) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      chatScrollController.animateTo(
+          chatScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut);
+    }
   }
 }

@@ -35,22 +35,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Text('Triage Guanajuato',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white)),
-                SizedBox(height: 3),
+                SizedBox(height: 2),
                 Text('Estás hablando con HealthGPT',
-                    style: TextStyle(fontSize: 14, color: Colors.white)),
+                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ],
             ),
           ),
           Align(
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.only(
-                  left:
-                      8), // Ajusta este valor para desplazar la imagen a la derecha
-              child: Image.asset('images/gto.png', height: 40),
+              padding: const EdgeInsets.only(left: 0),
+              child: Image.asset('images/gto.png', height: 30),
             ),
           ),
         ],

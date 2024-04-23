@@ -4,9 +4,7 @@ import 'package:yes_no/domain/entities/message.dart';
 class ApiService {
   final Dio _dio = Dio(); // Instancia de Dio para realizar solicitudes HTTP
 
-  // Actualiza la URL del endpoint a la dirección correcta del servidor FastAPI
-  final String _apiUrl =
-      'https://codigoai.azurewebsites.net/triage/'; // Asegúrate de cambiar esto por la IP correcta o URL
+  final String _apiUrl = 'https://codigoai.azurewebsites.net/triage/';
 
   // Método para enviar mensaje y recibir respuesta de la API
   Future<Message> sendChatMessage(String text) async {

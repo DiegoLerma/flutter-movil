@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:yes_no/domain/entities/message.dart';
 
 class BotMessageBubble extends StatelessWidget {
   final Message message;
+
   const BotMessageBubble({super.key, required this.message});
 
   @override
@@ -18,8 +20,17 @@ class BotMessageBubble extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text(message.text,
-                  style: const TextStyle(color: Colors.white)),
+              // Aquí usamos MarkdownBody para renderizar el mensaje
+              child: MarkdownBody(
+                data: message.text,
+                styleSheet:
+                    MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                  p: const TextStyle(color: Colors.white), // Texto en markdown
+                  strong: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold), // Para el texto en negrita
+                ),
+              ),
             )),
         const SizedBox(
             height: 10), // Mantenemos un pequeño espacio después del mensaje

@@ -42,7 +42,7 @@ class MessageFieldBox extends StatelessWidget {
                 if (textController.text.trim().isNotEmpty) {
                   onValue(textController.text.trim());
                   textController.clear();
-                  focusNode.unfocus();
+                  // focusNode.unfocus();
                 }
               },
             ),
