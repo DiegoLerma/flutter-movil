@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Codigo IA',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme(selectedColor: 4).theme(),
+        theme: AppTheme(selectedColor: 1).theme(),
         home: const HomeScreen(),
       ),
     );

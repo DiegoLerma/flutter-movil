@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
+import 'package:yes_no/config/theme/app_theme.dart';
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
@@ -9,13 +11,25 @@ class SummaryScreen extends StatefulWidget {
   SummaryScreenState createState() => SummaryScreenState();
 }
 
+class Summary {
+  final String title;
+  final String content;
+
+  Summary({required this.title, required this.content});
+
+  factory Summary.fromJson(Map<String, dynamic> json) {
+    return Summary(
+      title: json['title'],
+      content: json['content'],
+    );
+  }
+}
+
 class SummaryScreenState extends State<SummaryScreen> {
   final TextEditingController _dateController = TextEditingController();
-  String _summaries =
-      "Por favor, seleccione una fecha para cargar los resúmenes.";
-  final Dio _dio = Dio(); // Instancia de Dio
+  List<Summary> _summaries = [];
+  final Dio _dio = Dio();
 
-  // Método para abrir el selector de fecha
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -24,25 +38,35 @@ class SummaryScreenState extends State<SummaryScreen> {
       lastDate: DateTime(2025),
     );
     if (picked != null && picked != DateTime.now()) {
-      _dateController.text = DateFormat('dd-MM-yyyy').format(picked);
-      _fetchSummaries(); // Cargar resúmenes automáticamente al seleccionar la fecha
+      String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
+      _dateController.text = formattedDate;
+      _fetchSummaries();
     }
   }
 
-  // Método para obtener los resúmenes médicos de la fecha especificada usando Dio
   Future<void> _fetchSummaries() async {
     if (_dateController.text.isEmpty) {
       return;
     }
     try {
-      final response = await _dio
-          .get('http://codigoai.azurewebsites.net/${_dateController.text}/');
-      setState(() {
-        _summaries = response.data.toString();
-      });
+      final url =
+          'https://codigoai.azurewebsites.net/med_summaries/${_dateController.text}';
+      final response = await _dio.get(url);
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = response.data;
+        setState(() {
+          _summaries =
+              responseData.map((data) => Summary.fromJson(data)).toList();
+        });
+      } else {
+        throw Exception(
+            'Failed to load summaries with status code: ${response.statusCode}');
+      }
     } catch (e) {
       setState(() {
-        _summaries = "Error al obtener los datos: $e";
+        _summaries = [];
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al obtener los datos: $e')));
       });
     }
   }
@@ -50,12 +74,10 @@ class SummaryScreenState extends State<SummaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Resúmenes Médicos"),
-      ),
+      appBar: AppBar(title: const Text("Resúmenes Médicos")),
       body: SingleChildScrollView(
         child: Column(
-          children: <Widget>[
+          children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
@@ -68,19 +90,29 @@ class SummaryScreenState extends State<SummaryScreen> {
                     onPressed: () => _selectDate(context),
                   ),
                 ),
-                keyboardType: TextInputType.number,
-                onSubmitted: (_) =>
-                    _fetchSummaries(), // Cargar resúmenes al presionar Enter
+                keyboardType: TextInputType.datetime,
+                onSubmitted: (_) => _fetchSummaries(),
               ),
             ),
             ElevatedButton(
               onPressed: _fetchSummaries,
               child: const Text('Cargar Resúmenes'),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(_summaries),
-            ),
+            ..._summaries.map((summary) => ExpansionTile(
+                  backgroundColor: Colors.amber,
+                  title: Text(summary.title,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      )),
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: MarkdownBody(data: summary.content),
+                    )
+                  ],
+                )),
           ],
         ),
       ),
