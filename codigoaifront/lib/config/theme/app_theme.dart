@@ -4,12 +4,14 @@ const Color _customColor = Color.fromRGBO(250, 247, 242, 1);
 
 const List<Color> _colorThemes = [
   _customColor,
-  Color.fromRGBO(179, 219, 218, 1),
-  Color.fromRGBO(254, 229, 224, 1),
-  Color.fromRGBO(13, 146, 118, 1),
-  Color.fromRGBO(255, 191, 195, 1),
-  Color.fromRGBO(169, 160, 153, 1),
-  Color.fromRGBO(218, 235, 250, 1),
+  Colors.black,
+  Colors.red,
+  Colors.redAccent,
+  Colors.blue,
+  Colors.white,
+  Colors.orange,
+  Colors.purple,
+  Colors.pinkAccent,
 ];
 
 class AppTheme {

@@ -32,7 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Triage Guanajuato',
+                Text('Asistente de Salud',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 20,
@@ -40,26 +40,26 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         color: Colors.white)),
                 SizedBox(height: 2),
                 Text('Estás hablando con HealthGPT',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
+                    style: TextStyle(fontSize: 14, color: Colors.white)),
               ],
             ),
           ),
           Align(
-            alignment: Alignment.topLeft,
+            alignment: Alignment.centerLeft,
             child: Padding(
               padding: const EdgeInsets.only(left: 0),
-              child: Image.asset('images/gto.png', height: 30),
+              child: Image.asset('images/logo2.png', height: 50),
             ),
           ),
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.primary,
-      elevation: 0,
+      elevation: 100, // Aumenta la elevación para una sombra más prominente
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 7);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 6);
 }
 
 class _ChatView extends StatelessWidget {

@@ -24,8 +24,8 @@ class UserMessageBubble extends StatelessWidget {
                 data: message.text,
                 styleSheet:
                     MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                  p: TextStyle(color: Colors.white), // Texto en markdown
-                  strong: TextStyle(
+                  p: const TextStyle(color: Colors.white), // Texto en markdown
+                  strong: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold), // Para texto en negrita
                 ),

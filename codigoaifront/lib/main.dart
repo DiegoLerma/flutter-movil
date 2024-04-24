@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:yes_no/config/theme/app_theme.dart';
 import 'package:yes_no/presentation/providers/chat_provider.dart';
 import 'package:yes_no/presentation/screens/chat/chat_screen.dart';
-import 'package:yes_no/presentation/screens/summary/summary_screen.dart'; // Asegúrate de tener este archivo
+import 'package:yes_no/presentation/screens/summary/summary_screen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -57,11 +57,11 @@ class HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
+            icon: Icon(Icons.question_answer_outlined),
             label: 'Chat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.folder),
+            icon: Icon(Icons.paste_outlined),
             label: 'Summaries',
           ),
         ],

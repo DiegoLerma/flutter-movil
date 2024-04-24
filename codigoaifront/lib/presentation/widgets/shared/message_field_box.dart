@@ -51,7 +51,7 @@ class MessageFieldBoxState extends State<MessageFieldBox> {
                 hintText: 'Escriba su mensaje...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
+                  // borderSide: BorderSide.none,
                 ),
                 filled: true,
                 fillColor: Colors.white,

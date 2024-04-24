@@ -2,7 +2,7 @@
     <application
         android:label="Codigo IA"
         android:name="${applicationName}"
-        android:icon="@mipmap/logo">
+        android:icon="@mipmap/rc">
         <activity
             android:name=".MainActivity"
             android:exported="true"

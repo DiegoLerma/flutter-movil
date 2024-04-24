@@ -8,7 +8,6 @@ class BotMessageBubble extends StatelessWidget {
   const BotMessageBubble({super.key, required this.message});
 
   Color _getMessageBackgroundColor(String messageText, ColorScheme colors) {
-    print("Processing message: $messageText"); // Añade esta línea para depurar
     final lowerCaseText = messageText.toLowerCase();
 
     if (lowerCaseText.contains('código rojo')) {
