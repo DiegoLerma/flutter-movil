@@ -35,13 +35,8 @@ class SummaryScreenState extends State<SummaryScreen> {
     try {
       const url = 'https://codigoai.azurewebsites.net/med_summaries/';
       final response = await _dio.get(url);
-      print("Response status code: ${response.statusCode}");
       if (response.statusCode == 200) {
-        print("Tipo de response.data: ${response.data.runtimeType}");
-        print("Datos crudos: $response.data");
-
         final List<Summary> summaryDB = summaryFromJson(response.data);
-        print("Datos procesados: $summaryDB");
 
         List<Summary> filteredSummaries = summaryDB
             .where((summary) =>
@@ -70,7 +65,6 @@ class SummaryScreenState extends State<SummaryScreen> {
             'Failed to load summaries with status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error al obtener los datos: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error al obtener los datos: $e')));
@@ -88,8 +82,6 @@ class SummaryScreenState extends State<SummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "Summaries by color $summariesByColor"); // Asegúrate de que los datos se han cargado correctamente
     return Scaffold(
       appBar: AppBar(
         title: const Text("Resúmenes Médicos"),
@@ -110,8 +102,6 @@ class SummaryScreenState extends State<SummaryScreen> {
   }
 
   List<Widget> _buildSummaryWidgets() {
-    print(
-        "Summaries by color in build Summary $summariesByColor"); // Asegúrate de que los datos se han cargado correctamente
     return summariesByColor.entries
         .expand((entry) => [
               if (entry.value.isNotEmpty)
@@ -124,8 +114,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                           color: TriageUtils.colorFromTriage(entry.key))),
                 ),
               ...entry.value.map((summary) => Card(
-                    color: summary.content.contentDetails
-                        .color, // Asumiendo que el color se determina aquí
+                    color: summary.content.contentDetails.color,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ExpansionTile(
@@ -145,13 +134,13 @@ class SummaryScreenState extends State<SummaryScreen> {
                                   .resumen, // Mostrar el resumen en Markdown
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: MarkdownBody(
-                              data: summary.content.contentDetails
-                                  .formattedConversation, // Mostrar la conversación completa formateada
-                            ),
-                          ),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(16.0),
+                          //   child: MarkdownBody(
+                          //     data: summary.content.contentDetails
+                          //         .formattedConversation, // Mostrar la conversación completa formateada
+                          // ),
+                          // ),
                         ],
                       ),
                     ),
