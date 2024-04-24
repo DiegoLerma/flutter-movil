@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:intl/intl.dart';
 import 'package:yes_no/domain/entities/summary.dart';
 import 'package:yes_no/config/helpers/api_service.dart';
 
@@ -13,8 +14,6 @@ class SummaryScreen extends StatefulWidget {
 }
 
 class SummaryScreenState extends State<SummaryScreen> {
-  final TextEditingController _dateController = TextEditingController(
-      text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
   Map<String, List<Summary>> summariesByColor = {};
   final Dio _dio = Dio();
   late ApiService _apiService;
@@ -23,73 +22,46 @@ class SummaryScreenState extends State<SummaryScreen> {
   void initState() {
     super.initState();
     _apiService = ApiService(_dio); // Initialize the API service
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
-    );
-    if (picked != null && picked != DateTime.now()) {
-      String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
-      _dateController.text = formattedDate;
-      _fetchSummaries();
-    }
+    _fetchSummaries();
   }
 
   Future<void> _fetchSummaries() async {
-    if (_dateController.text.isEmpty) {
-      return;
-    }
     try {
-      final url =
-          'https://codigoai.azurewebsites.net/med_summaries/${_dateController.text}';
+      const url = 'https://codigoai.azurewebsites.net/med_summaries/';
       final response = await _dio.get(url);
-      print(response.data);
-
+      print(response.statusCode);
       if (response.statusCode == 200) {
-        List<dynamic> responseData = response.data ?? [];
-        var summaries = responseData
-            .where((data) =>
-                data['attended'] == false) // Filtrar solo no atendidos
-            .map((data) => Summary.fromJson(data as Map<String, dynamic>))
+        // Convertir la respuesta a String si no se está haciendo
+        String responseString = jsonEncode(response.data);
+        List<Summary> summaries = summaryFromJson(responseString);
+
+        print("Summaries: $summaries");
+
+        // Filtra los resúmenes que no han sido atendidos y que no se han ido sin atención
+        List<Summary> filteredSummaries = summaries
+            .where((summary) =>
+                !summary.content.attended &&
+                !summary.content.goneWithoutAttention)
             .toList();
-        if (responseData.isEmpty) {
-          // Verifica si el widget aún está montado antes de interactuar con el context
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('No existen registros para ese día')));
-            setState(() {
-              summariesByColor = {};
-            });
-          }
-          return;
+
+        // Agrupa los resúmenes por el color de triage
+        Map<String, List<Summary>> newSummariesByColor = {
+          'rojo': [],
+          'naranja': [],
+          'amarillo': [],
+          'verde': []
+        };
+
+        for (var summary in filteredSummaries) {
+          var triageColorKey = summary.content.colorDeTriage.toLowerCase();
+          print("Triage color key: $triageColorKey");
+          newSummariesByColor[triageColorKey]?.add(summary);
         }
 
-        summariesByColor = {
-          'Rojo': [],
-          'Naranja': [],
-          'Amarillo': [],
-          'Verde': []
-        };
-        for (var summary in summaries) {
-          var triageColorKey = summary.content.colorDeTriage
-              .toLowerCase(); // asegúrate de manejar las claves consistentemente en minúsculas
-          if (summariesByColor.containsKey(triageColorKey)) {
-            summariesByColor[triageColorKey]?.add(summary);
-          } else {
-            summariesByColor[triageColorKey] = [
-              summary
-            ]; // Crea una nueva entrada si la clave no existe
-          }
-        }
-        if (mounted) {
-          setState(() {
-            // Esto actualizará la UI con los nuevos summaries agrupados por color
-          });
-        }
+        setState(() {
+          summariesByColor =
+              newSummariesByColor; // Actualiza el estado con los resúmenes filtrados y agrupados
+        });
       } else {
         throw Exception(
             'Failed to load summaries with status code: ${response.statusCode}');
@@ -98,15 +70,17 @@ class SummaryScreenState extends State<SummaryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error al obtener los datos: $e')));
-        setState(() {
-          summariesByColor = {};
-        });
       }
+      setState(() {
+        summariesByColor = {};
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    print(
+        "Summaries by color $summariesByColor"); // Asegúrate de que los datos se han cargado correctamente
     return Scaffold(
       appBar: AppBar(
         title: const Text("Resúmenes Médicos"),
@@ -114,25 +88,9 @@ class SummaryScreenState extends State<SummaryScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _dateController,
-                decoration: InputDecoration(
-                  labelText: 'Ingrese la fecha',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context),
-                  ),
-                ),
-                keyboardType: TextInputType.datetime,
-                onSubmitted: (_) => _fetchSummaries(),
-              ),
-            ),
             ElevatedButton(
               onPressed: _fetchSummaries,
-              child: const Text('Cargar Resúmenes'),
+              child: const Text('Actualizar Resúmenes'),
             ),
             const SizedBox(height: 16.0),
             ..._buildSummaryWidgets(),
@@ -143,6 +101,8 @@ class SummaryScreenState extends State<SummaryScreen> {
   }
 
   List<Widget> _buildSummaryWidgets() {
+    print(
+        summariesByColor); // Asegúrate de que los datos se han cargado correctamente
     return summariesByColor.entries
         .expand((entry) => [
               if (entry.value.isNotEmpty)
