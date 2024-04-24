@@ -1,71 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'dart:convert';
 
 // To parse this JSON data, do
-//
-//     final summary = summaryFromJson(jsonString);
-
-List<Summary> summaryFromJson(String str) =>
-    List<Summary>.from(json.decode(str).map((x) => Summary.fromJson(x)));
+//     final summary = summaryFromJson(jsonData);
+List<Summary> summaryFromJson(List<dynamic> jsonData) {
+  return List<Summary>.from(
+      jsonData.map((x) => Summary.fromJson(x as Map<String, dynamic>)));
+}
 
 String summaryToJson(List<Summary> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Summary {
   final String title;
-  final SummaryContent content;
+  final Content content;
 
-  Summary({
-    required this.title,
-    required this.content,
-  });
+  Summary({required this.title, required this.content});
 
   factory Summary.fromJson(Map<String, dynamic> json) {
     return Summary(
-      title: json["title"] as String,
-      content: SummaryContent.fromJson(json["content"] as Map<String, dynamic>),
+      title: json['title'] as String? ?? '',
+      content: Content.fromJson(json['content'] as Map<String, dynamic>),
     );
   }
-
   Map<String, dynamic> toJson() => {
         "title": title,
         "content": content.toJson(),
       };
 }
 
-class SummaryContent {
+class Content {
   final String id;
-  final ContentContent content;
+  final ContentDetails contentDetails;
   final bool attended;
   final bool goneWithoutAttention;
   final String colorDeTriage;
 
-  SummaryContent({
+  Content({
     required this.id,
-    required this.content,
+    required this.contentDetails,
     required this.attended,
     required this.goneWithoutAttention,
     required this.colorDeTriage,
   });
 
-  factory SummaryContent.fromJson(Map<String, dynamic> json) => SummaryContent(
-        id: json["id"],
-        content: ContentContent.fromJson(json["content"]),
-        attended: json["attended"],
-        goneWithoutAttention: json["gone_without_attention"],
-        colorDeTriage: json["color_de_triage"] as String,
-      );
+  factory Content.fromJson(Map<String, dynamic> json) {
+    return Content(
+      id: json['id'] as String? ?? '',
+      contentDetails:
+          ContentDetails.fromJson(json['content'] as Map<String, dynamic>),
+      attended: json['attended'] as bool? ?? false,
+      goneWithoutAttention: json['gone_without_attention'] as bool? ?? false,
+      colorDeTriage: json['color_de_triage'] as String? ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "content": content.toJson(),
+        "content": contentDetails
+            .toJson(), // Asegúrate de que contentDetails también tenga un método toJson()
         "attended": attended,
         "gone_without_attention": goneWithoutAttention,
+        "color_de_triage":
+            colorDeTriage, // Incluye este campo para mantener consistencia con el formato JSON.
       };
 }
 
-class ContentContent {
+class ContentDetails {
   final String colorDeTriage;
   final String fecha;
   final String nombre;
@@ -73,9 +74,9 @@ class ContentContent {
   final String edad;
   final String motivoDeConsulta;
   final String resumen;
-  final List<ConversacionCompleta> conversacionCompleta;
+  final List<Conversation> conversacionCompleta;
 
-  ContentContent({
+  ContentDetails({
     required this.colorDeTriage,
     required this.fecha,
     required this.nombre,
@@ -86,31 +87,20 @@ class ContentContent {
     required this.conversacionCompleta,
   });
 
-  // Método para convertir la conversación completa en un string de Markdown
-  String get formattedConversation {
-    return conversacionCompleta
-        .map((msg) => '**${msg.rol}**: ${msg.contenido}\n\n')
-        .join();
-  }
-
-  factory ContentContent.fromJson(Map<String, dynamic> json) {
-    DateFormat inputFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat outputFormat = DateFormat("dd-MM-yyyy");
-
-    DateTime date = inputFormat.parse(json["fecha"]);
-    String formattedDate = outputFormat.format(date);
-
-    return ContentContent(
-      colorDeTriage: json["color_de_triage"],
-      fecha: formattedDate, // Usar fecha formateada
-      nombre: json["nombre"],
-      sexo: json["sexo"],
-      edad: json["edad"],
-      motivoDeConsulta: json["motivo_de_consulta"],
-      resumen: json["resumen"],
-      conversacionCompleta: List<ConversacionCompleta>.from(
-          json["conversacion_completa"]
-              .map((x) => ConversacionCompleta.fromJson(x))),
+  factory ContentDetails.fromJson(Map<String, dynamic> json) {
+    return ContentDetails(
+      colorDeTriage: json['color_de_triage'] as String? ?? 'Desconocido',
+      fecha: json['fecha'] as String? ?? 'Fecha desconocida',
+      nombre: json['nombre'] as String? ?? 'Nombre desconocido',
+      sexo: json['sexo'] as String? ?? 'Sexo desconocido',
+      edad: json['edad'] as String? ?? 'Edad desconocida',
+      motivoDeConsulta:
+          json['motivo_de_consulta'] as String? ?? 'Motivo desconocido',
+      resumen: json['resumen'] as String? ?? 'Sin resumen',
+      conversacionCompleta:
+          (json['conversacion_completa'] as List<dynamic>? ?? [])
+              .map((x) => Conversation.fromJson(x as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -126,37 +116,26 @@ class ContentContent {
             List<dynamic>.from(conversacionCompleta.map((x) => x.toJson())),
       };
 
-  Color get color => colorFromTriage(colorDeTriage);
-
-  static Color colorFromTriage(String color) {
-    switch (color.toLowerCase()) {
-      case 'rojo':
-        return Colors.redAccent.shade100;
-      case 'naranja':
-        return Colors.orangeAccent.shade100;
-      case 'amarillo':
-        return Colors.yellowAccent.shade100;
-      case 'verde':
-        return Colors.greenAccent.shade100;
-      default:
-        return Colors.grey.shade300;
+  String get formattedConversation {
+    String formatted = '';
+    for (var conversation in conversacionCompleta) {
+      formatted += '**${conversation.rol}:** ${conversation.contenido}\n\n';
     }
+    return formatted;
   }
+
+  Color get color => TriageUtils.colorFromTriage(colorDeTriage);
 }
 
-class ConversacionCompleta {
+class Conversation {
   final String rol;
   final String contenido;
 
-  ConversacionCompleta({
-    required this.rol,
-    required this.contenido,
-  });
+  Conversation({required this.rol, required this.contenido});
 
-  factory ConversacionCompleta.fromJson(Map<String, dynamic> json) =>
-      ConversacionCompleta(
-        rol: json["rol"],
-        contenido: json["contenido"],
+  factory Conversation.fromJson(Map<String, dynamic> json) => Conversation(
+        rol: json['rol'] as String? ?? '',
+        contenido: json['contenido'] as String? ?? '',
       );
 
   Map<String, dynamic> toJson() => {

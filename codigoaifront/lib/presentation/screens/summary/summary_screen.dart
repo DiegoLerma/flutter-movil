@@ -1,4 +1,4 @@
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -25,56 +25,65 @@ class SummaryScreenState extends State<SummaryScreen> {
     _fetchSummaries();
   }
 
+  @override
+  void dispose() {
+    _dio.close(); // Cerrar el cliente Dio cuando el widget se elimine
+    super.dispose();
+  }
+
   Future<void> _fetchSummaries() async {
     try {
       const url = 'https://codigoai.azurewebsites.net/med_summaries/';
       final response = await _dio.get(url);
-      print(response.statusCode);
+      print("Response status code: ${response.statusCode}");
       if (response.statusCode == 200) {
-        // Convertir la respuesta a String si no se está haciendo
-        String responseString = jsonEncode(response.data);
-        List<Summary> summaries = summaryFromJson(responseString);
+        print("Tipo de response.data: ${response.data.runtimeType}");
+        print("Datos crudos: $response.data");
 
-        print("Summaries: $summaries");
+        final List<Summary> summaryDB = summaryFromJson(response.data);
+        print("Datos procesados: $summaryDB");
 
-        // Filtra los resúmenes que no han sido atendidos y que no se han ido sin atención
-        List<Summary> filteredSummaries = summaries
+        List<Summary> filteredSummaries = summaryDB
             .where((summary) =>
                 !summary.content.attended &&
                 !summary.content.goneWithoutAttention)
             .toList();
 
-        // Agrupa los resúmenes por el color de triage
-        Map<String, List<Summary>> newSummariesByColor = {
-          'rojo': [],
-          'naranja': [],
-          'amarillo': [],
-          'verde': []
-        };
+        Map<String, List<Summary>> newSummariesByColor = {};
 
         for (var summary in filteredSummaries) {
           var triageColorKey = summary.content.colorDeTriage.toLowerCase();
-          print("Triage color key: $triageColorKey");
-          newSummariesByColor[triageColorKey]?.add(summary);
+          if (!newSummariesByColor.containsKey(triageColorKey)) {
+            newSummariesByColor[triageColorKey] = [];
+          }
+          newSummariesByColor[triageColorKey]!.add(summary);
         }
 
-        setState(() {
-          summariesByColor =
-              newSummariesByColor; // Actualiza el estado con los resúmenes filtrados y agrupados
-        });
+        if (mounted) {
+          // Verificar si el widget todavía está en el árbol
+          setState(() {
+            summariesByColor = newSummariesByColor;
+          });
+        }
       } else {
         throw Exception(
             'Failed to load summaries with status code: ${response.statusCode}');
       }
     } catch (e) {
+      print('Error al obtener los datos: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error al obtener los datos: $e')));
       }
-      setState(() {
-        summariesByColor = {};
-      });
+      if (mounted) {
+        // Verificar si el widget todavía está en el árbol
+        setState(() {
+          summariesByColor = {};
+        });
+      }
     }
+
+    // ... el resto del código ...
   }
 
   @override
@@ -102,7 +111,7 @@ class SummaryScreenState extends State<SummaryScreen> {
 
   List<Widget> _buildSummaryWidgets() {
     print(
-        summariesByColor); // Asegúrate de que los datos se han cargado correctamente
+        "Summaries by color in build Summary $summariesByColor"); // Asegúrate de que los datos se han cargado correctamente
     return summariesByColor.entries
         .expand((entry) => [
               if (entry.value.isNotEmpty)
@@ -115,7 +124,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                           color: TriageUtils.colorFromTriage(entry.key))),
                 ),
               ...entry.value.map((summary) => Card(
-                    color: summary.content.content
+                    color: summary.content.contentDetails
                         .color, // Asumiendo que el color se determina aquí
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -132,14 +141,16 @@ class SummaryScreenState extends State<SummaryScreen> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: MarkdownBody(
-                                data: summary.content.content
-                                    .resumen), // Mostrar el resumen en Markdown
+                              data: summary.content.contentDetails
+                                  .resumen, // Mostrar el resumen en Markdown
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: MarkdownBody(
-                                data: summary.content.content
-                                    .formattedConversation), // Mostrar la conversación completa formateada
+                              data: summary.content.contentDetails
+                                  .formattedConversation, // Mostrar la conversación completa formateada
+                            ),
                           ),
                         ],
                       ),
