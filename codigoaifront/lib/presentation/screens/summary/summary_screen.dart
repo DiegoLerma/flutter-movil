@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:yes_no/domain/entities/summary.dart';
 import 'package:yes_no/config/helpers/api_service.dart';
@@ -76,24 +77,27 @@ class SummaryScreenState extends State<SummaryScreen> {
         });
       }
     }
-
-    // ... el resto del código ...
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Resúmenes Médicos"),
+        title: const Center(
+            child: Text(
+          "Resúmenes Médicos",
+          style: TextStyle(color: Colors.white),
+        )),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: _fetchSummaries,
               child: const Text('Actualizar Resúmenes'),
             ),
-            const SizedBox(height: 16.0),
             ..._buildSummaryWidgets(),
           ],
         ),
@@ -102,11 +106,20 @@ class SummaryScreenState extends State<SummaryScreen> {
   }
 
   List<Widget> _buildSummaryWidgets() {
-    return summariesByColor.entries
+    // Definir el orden deseado de los colores
+    const List<String> colorOrder = ['rojo', 'naranja', 'amarillo', 'verde'];
+
+    // Ordenar las entradas del mapa según el orden definido
+    final sortedEntries = summariesByColor.entries.toList()
+      ..sort((a, b) =>
+          colorOrder.indexOf(a.key).compareTo(colorOrder.indexOf(b.key)));
+
+    return sortedEntries
         .expand((entry) => [
               if (entry.value.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(
+                      bottom: BorderSide.strokeAlignCenter),
                   child: Text(entry.key,
                       style: TextStyle(
                           fontSize: 24,
@@ -122,7 +135,8 @@ class SummaryScreenState extends State<SummaryScreen> {
                             style:
                                 const TextStyle(fontWeight: FontWeight.bold)),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.check_circle_outline_outlined,
+                              color: Colors.black),
                           onPressed: () => _apiService
                               .markSummaryAsAttended(summary.content.id),
                         ),
@@ -134,13 +148,6 @@ class SummaryScreenState extends State<SummaryScreen> {
                                   .resumen, // Mostrar el resumen en Markdown
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(16.0),
-                          //   child: MarkdownBody(
-                          //     data: summary.content.contentDetails
-                          //         .formattedConversation, // Mostrar la conversación completa formateada
-                          // ),
-                          // ),
                         ],
                       ),
                     ),
