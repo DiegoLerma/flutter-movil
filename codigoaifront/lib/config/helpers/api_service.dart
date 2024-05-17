@@ -1,31 +1,30 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:yes_no/domain/entities/message.dart';
 
 class ApiService {
-  final Dio _dio; // Hace _dio un campo final que debe ser inicializado
+  final String _apiUrl = 'https://codigoiabackend.azurewebsites.net/triage/';
 
-  // Modifica el constructor para aceptar una instancia de Dio
-  ApiService(this._dio);
-
-  final String _apiUrl = 'https://codigoai.azurewebsites.net/triage/';
-
-  // Método para enviar mensaje y recibir respuesta de la API
   Future<Message> sendChatMessage(String text) async {
     try {
-      final response = await _dio.post(
-        _apiUrl,
-        data: {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {
+          'Content-Type':
+              'application/json; charset=UTF-8', // Añadir charset=UTF-8
+          'Origin': 'https://tudominio.com' // Agregar el encabezado Origin
+        },
+        body: jsonEncode({
           "messages": [
             {"role": "user", "content": text}
           ]
-        },
+        }),
       );
-      if (response.statusCode == 200 && response.data != null) {
-        // Asume que la respuesta es directamente el texto del mensaje
-        // Extrae el texto usando la clave 'text'
-        return Message(text: response.data['text'], fromWho: FromWho.bot);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(
+            response.bodyBytes)); // Decodificar el cuerpo de la respuesta
+        return Message(text: data['text'], fromWho: FromWho.bot);
       } else {
-        // Lanza una excepción si la respuesta no es válida
         throw Exception(
             'Error al cargar el mensaje. Por favor revise su conexión a internet.');
       }
@@ -35,11 +34,11 @@ class ApiService {
     }
   }
 
-  // Método para marcar un resumen como atendido
   Future<void> markSummaryAsAttended(String summaryId) async {
     try {
-      final response = await _dio
-          .post('${_apiUrl}summary_status/update_attended/$summaryId');
+      final response = await http.post(
+        Uri.parse('${_apiUrl}summary_status/update_attended/$summaryId'),
+      );
       if (response.statusCode != 200) {
         throw Exception(
             'Failed to mark summary as attended with status code: ${response.statusCode}');
@@ -49,11 +48,12 @@ class ApiService {
     }
   }
 
-  // Método para marcar un resumen como ignorado
   Future<void> markSummaryAsGoneWithoutAttention(String summaryId) async {
     try {
-      final response = await _dio.post(
-          '${_apiUrl}summary_status/update_gone_without_attention/$summaryId');
+      final response = await http.post(
+        Uri.parse(
+            '${_apiUrl}summary_status/update_gone_without_attention/$summaryId'),
+      );
       if (response.statusCode != 200) {
         throw Exception(
             'Failed to mark summary as gone without attention with status code: ${response.statusCode}');

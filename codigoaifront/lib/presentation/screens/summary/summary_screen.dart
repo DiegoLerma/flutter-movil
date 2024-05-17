@@ -1,8 +1,6 @@
-// import 'dart:convert';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:yes_no/domain/entities/summary.dart';
 import 'package:yes_no/config/helpers/api_service.dart';
@@ -16,50 +14,48 @@ class SummaryScreen extends StatefulWidget {
 
 class SummaryScreenState extends State<SummaryScreen> {
   Map<String, List<Summary>> summariesByColor = {};
-  final Dio _dio = Dio();
   late ApiService _apiService;
 
   @override
   void initState() {
     super.initState();
-    _apiService = ApiService(_dio); // Initialize the API service
+    _apiService = ApiService(); // Initialize the API service
     _fetchSummaries();
-  }
-
-  @override
-  void dispose() {
-    _dio.close(); // Cerrar el cliente Dio cuando el widget se elimine
-    super.dispose();
   }
 
   Future<void> _fetchSummaries() async {
     try {
-      const url = 'https://codigoai.azurewebsites.net/med_summaries/';
-      final response = await _dio.get(url);
+      const url = 'https://codigoiabackend.azurewebsites.net/med_summaries/';
+      final response = await http.get(Uri.parse(url));
+
       if (response.statusCode == 200) {
-        final List<Summary> summaryDB = summaryFromJson(response.data);
+        try {
+          final List<dynamic> jsonResponse = jsonDecode(response.body);
+          final List<Summary> summaryDB = summaryFromJson(jsonResponse);
 
-        List<Summary> filteredSummaries = summaryDB
-            .where((summary) =>
-                !summary.content.attended &&
-                !summary.content.goneWithoutAttention)
-            .toList();
+          List<Summary> filteredSummaries = summaryDB
+              .where((summary) =>
+                  !summary.content.attended &&
+                  !summary.content.goneWithoutAttention)
+              .toList();
 
-        Map<String, List<Summary>> newSummariesByColor = {};
+          Map<String, List<Summary>> newSummariesByColor = {};
 
-        for (var summary in filteredSummaries) {
-          var triageColorKey = summary.content.colorDeTriage.toLowerCase();
-          if (!newSummariesByColor.containsKey(triageColorKey)) {
-            newSummariesByColor[triageColorKey] = [];
+          for (var summary in filteredSummaries) {
+            var triageColorKey = summary.content.colorDeTriage.toLowerCase();
+            if (!newSummariesByColor.containsKey(triageColorKey)) {
+              newSummariesByColor[triageColorKey] = [];
+            }
+            newSummariesByColor[triageColorKey]!.add(summary);
           }
-          newSummariesByColor[triageColorKey]!.add(summary);
-        }
 
-        if (mounted) {
-          // Verificar si el widget todavía está en el árbol
-          setState(() {
-            summariesByColor = newSummariesByColor;
-          });
+          if (mounted) {
+            setState(() {
+              summariesByColor = newSummariesByColor;
+            });
+          }
+        } catch (e) {
+          print("Error al parsear la respuesta: $e");
         }
       } else {
         throw Exception(
@@ -71,7 +67,6 @@ class SummaryScreenState extends State<SummaryScreen> {
             SnackBar(content: Text('Error al obtener los datos: $e')));
       }
       if (mounted) {
-        // Verificar si el widget todavía está en el árbol
         setState(() {
           summariesByColor = {};
         });
@@ -107,7 +102,7 @@ class SummaryScreenState extends State<SummaryScreen> {
 
   List<Widget> _buildSummaryWidgets() {
     // Definir el orden deseado de los colores
-    const List<String> colorOrder = ['rojo', 'naranja', 'amarillo', 'verde'];
+    const List<String> colorOrder = ['rojo'];
 
     // Ordenar las entradas del mapa según el orden definido
     final sortedEntries = summariesByColor.entries.toList()
@@ -120,20 +115,21 @@ class SummaryScreenState extends State<SummaryScreen> {
                 Padding(
                   padding: const EdgeInsets.only(
                       bottom: BorderSide.strokeAlignCenter),
-                  child: Text(entry.key,
-                      style: TextStyle(
-                          fontSize: 24,
+                  child: Text(
+                      'Pacientes por valorar ${entry.key.toUpperCase()}',
+                      style: const TextStyle(
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: TriageUtils.colorFromTriage(entry.key))),
+                          color: Colors.black)),
                 ),
               ...entry.value.map((summary) => Card(
                     color: summary.content.contentDetails.color,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ExpansionTile(
-                        title: Text(summary.title,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
+                        title: Text(summary.title.toUpperCase(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         trailing: IconButton(
                           icon: const Icon(Icons.check_circle_outline_outlined,
                               color: Colors.black),
@@ -144,9 +140,9 @@ class SummaryScreenState extends State<SummaryScreen> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: MarkdownBody(
-                              data: summary.content.contentDetails
-                                  .resumen, // Mostrar el resumen en Markdown
-                            ),
+                                data: summary.content.contentDetails
+                                    .resumen, // Mostrar el resumen en Markdown
+                                selectable: true),
                           ),
                         ],
                       ),

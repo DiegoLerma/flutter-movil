@@ -60,6 +60,8 @@ class MessageFieldBoxState extends State<MessageFieldBox> {
               ),
               textInputAction: TextInputAction.send,
               onFieldSubmitted: (value) => _sendMessage(),
+              textCapitalization: TextCapitalization
+                  .sentences, // Configura la capitalización del teclado
             ),
           ),
           const SizedBox(width: 8),
