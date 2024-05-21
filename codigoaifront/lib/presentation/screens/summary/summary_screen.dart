@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:yes_no/domain/entities/summary.dart';
-import 'package:yes_no/config/helpers/api_service.dart';
+import 'package:codigoia/domain/entities/summary.dart';
+import 'package:codigoia/config/helpers/api_service.dart';
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});

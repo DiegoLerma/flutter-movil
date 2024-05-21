@@ -1,4 +1,4 @@
-import 'package:yes_no/domain/entities/message.dart';
+import 'package:codigoia/domain/entities/message.dart';
 
 class ChatResponseModel {
   final String answer;

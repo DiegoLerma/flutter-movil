@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:yes_no/domain/entities/message.dart';
+import 'package:codigoia/domain/entities/message.dart';
 
 class ApiService {
   final String _apiUrl = 'https://codigoiabackend.azurewebsites.net/triage/';

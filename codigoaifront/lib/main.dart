@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yes_no/config/theme/app_theme.dart';
-import 'package:yes_no/presentation/providers/chat_provider.dart';
-import 'package:yes_no/presentation/screens/chat/chat_screen.dart';
-import 'package:yes_no/presentation/screens/summary/summary_screen.dart';
+import 'package:codigoia/config/theme/app_theme.dart';
+import 'package:codigoia/presentation/providers/chat_provider.dart';
+import 'package:codigoia/presentation/screens/chat/chat_screen.dart';
+import 'package:codigoia/presentation/screens/summary/summary_screen.dart';
 
 void main() => runApp(const MyApp());
 

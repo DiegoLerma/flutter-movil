@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:yes_no/domain/entities/message.dart';
+import 'package:codigoia/domain/entities/message.dart';
 
 class UserMessageBubble extends StatelessWidget {
   final Message message;

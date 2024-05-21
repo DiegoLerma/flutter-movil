@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yes_no/domain/entities/message.dart';
-import 'package:yes_no/presentation/providers/chat_provider.dart';
-import 'package:yes_no/presentation/widgets/chat/bot_message_bubble.dart';
-import 'package:yes_no/presentation/widgets/chat/user_message_bubble.dart';
-import 'package:yes_no/presentation/widgets/shared/message_field_box.dart';
+import 'package:codigoia/domain/entities/message.dart';
+import 'package:codigoia/presentation/providers/chat_provider.dart';
+import 'package:codigoia/presentation/widgets/chat/bot_message_bubble.dart';
+import 'package:codigoia/presentation/widgets/chat/user_message_bubble.dart';
+import 'package:codigoia/presentation/widgets/shared/message_field_box.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});

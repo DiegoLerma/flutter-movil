@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:yes_no/domain/entities/message.dart';
+import 'package:codigoia/domain/entities/message.dart';
 
 class ChatProvider extends ChangeNotifier {
   final ScrollController chatScrollController = ScrollController();
@@ -62,9 +62,10 @@ class ChatProvider extends ChangeNotifier {
     if (chatScrollController.hasClients) {
       await Future.delayed(const Duration(milliseconds: 100));
       chatScrollController.animateTo(
-          chatScrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut);
+        chatScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 }
